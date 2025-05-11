@@ -13,37 +13,49 @@ echo Checking for Python...
 %PYTHON_EXE% --version >nul 2>&1
 if errorlevel 1 (
     echo Python is not installed or not found in PATH.
-    echo Please install Python (3.7+) and ensure it's added to your PATH.
+    echo Please install Python 3.7+ and ensure it's added to your PATH.
     echo https://www.python.org/downloads/
-    goto :eof
+    exit /b 1
 )
 echo Python found.
-goto :eof
+exit /b 0
 
 :create_venv
 echo Creating virtual environment in %VENV_DIR%...
 %PYTHON_EXE% -m venv %VENV_DIR%
 if errorlevel 1 (
     echo Failed to create virtual environment.
-    goto :eof
+    exit /b 1
 )
 echo Virtual environment created.
-goto :eof
+exit /b 0
 
 :install_requirements
 echo Activating virtual environment and installing requirements...
 call .\%VENV_DIR%\Scripts\activate.bat
-pip install -r %REQUIREMENTS_FILE%
 if errorlevel 1 (
-    echo Failed to install requirements from %REQUIREMENTS_FILE%.
-    echo Deactivating virtual environment.
-    call .\%VENV_DIR%\Scripts\deactivate.bat
-    goto :eof
+    echo Failed to activate virtual environment .\%VENV_DIR%.
+    REM Deactivation is not applicable/safe if activation itself failed.
+    exit /b 1
 )
-echo Requirements installed successfully.
+
+pip install -r %REQUIREMENTS_FILE%
+set "PIP_INSTALL_ERRORLEVEL=%errorlevel%"
+
+REM Always attempt to deactivate, but the primary error status comes from pip.
 echo Deactivating virtual environment (it will be activated by individual script runners).
 call .\%VENV_DIR%\Scripts\deactivate.bat
-goto :eof
+if errorlevel 1 (
+    echo Warning: Failed to deactivate .\%VENV_DIR%\Scripts\activate.bat.
+)
+
+if %PIP_INSTALL_ERRORLEVEL% neq 0 (
+    echo Failed to install requirements from %REQUIREMENTS_FILE%. (Errorlevel: %PIP_INSTALL_ERRORLEVEL%)
+    exit /b 1
+)
+
+echo Requirements installed successfully.
+exit /b 0
 
 REM --- Main Script ---
 echo Starting LCMimicry Suite Setup...
@@ -75,7 +87,7 @@ REM Launch voice_model2.py in a new window
 start "Voice Model Processor" cmd /k "call .\%VENV_DIR%\Scripts\activate.bat && echo Activating venv for Voice Model Processor... && %PYTHON_EXE% voice_model2.py && echo Voice Model Processor finished. && pause"
 
 REM Launch ingame_llm_tts.py in a new window
-+start "In-Game LLM TTS" cmd /k "call .\%VENV_DIR%\Scripts\activate.bat && echo Activating venv for In-Game LLM TTS... && %PYTHON_EXE% ingame_llm_tts.py && echo In-Game LLM TTS finished. && pause"
+start "In-Game LLM TTS" cmd /k "call .\%VENV_DIR%\Scripts\activate.bat && echo Activating venv for In-Game LLM TTS... && %PYTHON_EXE% ingame_llm_tts.py && echo In-Game LLM TTS finished. && pause"
 
 echo.
 echo Scripts launched. Check the new command prompt windows for output.
