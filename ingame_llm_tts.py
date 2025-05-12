@@ -16,7 +16,7 @@ load_dotenv()
 
 # Set up OpenAI API key
 openai_api_key = os.getenv("OPENAI_API_KEY")
-client = OpenAI(openai_api_key)
+client = OpenAI(api_key=openai_api_key)
 
 lethal_company_moon_loot = {
     "Experimentation": ["Gold Bar", "Cash Register", "Laser Pointer", "Wedding Ring", "Air Horn", "V-type Engine", "Metal Sheet", "Large Axle", "Big Bolt", "Steering Wheel"],
@@ -174,8 +174,8 @@ def personalize_phrases(phrases, context):
 if __name__ == "__main__":
     # --------------------------------------------
     # MODIFY THIS PART FOR YOUR USE CASE
-    WATCH_DIR = "watch_folder"
-    OUTPUT_DIR = "test"
+    WATCH_DIR = "VoiceContexts"
+    OUTPUT_DIR = "ReceivedAudio"
     # --------------------------------------------
 
     os.makedirs(WATCH_DIR, exist_ok=True)
@@ -268,7 +268,7 @@ if __name__ == "__main__":
 
                 # Final status
                 if success:
-                    print(f"\nStep 5: TTS generation complete. WAV saved to: {out_path}")
+                    print(f"\nStep 5: TTS generation complete. mp3 saved to: {out_path}")
                 else:
                     print(f"\nStep 5: TTS generation failed for: {fname}")
 

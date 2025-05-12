@@ -16,11 +16,11 @@ API_ENDPOINT = f"{API_BASE_URL}/model"
 API_TOKEN = os.getenv("FISH_AUDIO_API_KEY")
 
 # --- Script Specific Configuration ---
-MONITOR_FOLDER = "dissonance_clips"  # Folder to watch for new WAV files
+MONITOR_FOLDER = "../Dissonance_Diagnostics"  # Folder to watch for new WAV files
 TEMP_FOLDER = "temp_stitch_processing" # Temporary folder for stitched files
 # Optional: Move processed files here instead of just tracking them
 # PROCESSED_ARCHIVE_FOLDER = "processed_audio_archive"
-TARGET_TOTAL_DURATION_SECONDS = 100 # Threshold to trigger stitching (in seconds)
+TARGET_TOTAL_DURATION_SECONDS = 50  # Threshold to trigger stitching (in seconds)
 POLLING_INTERVAL_SECONDS = 5        # How often to check the folder (in seconds)
 TARGET_SAMPLE_RATE = 16000          # Target sample rate in Hz for the API
 TARGET_CHANNELS = 1                  # Target channels (1 for mono) for the API
@@ -304,9 +304,17 @@ if __name__ == "__main__":
                 # -----------------------
 
                 print("--------------------------------------------------") # Separator after processing a batch
+            # --- 7. Clear all files in Dissonance_Diagnostics folder ---
+            try:
+                for filename in os.listdir(MONITOR_FOLDER):
+                    file_path = os.path.join(MONITOR_FOLDER, filename)
+                    if os.path.isfile(file_path):
+                        os.remove(file_path)
+                print(f"Cleared all files in monitor folder: {MONITOR_FOLDER}")
+            except Exception as e:
+                print(f"Warning: Failed to clear files in monitor folder {MONITOR_FOLDER}: {e}")
 
-
-            # --- 7. Wait for the next polling interval ---
+            # --- 8. Wait for the next polling interval ---
             # print(f"Waiting for {POLLING_INTERVAL_SECONDS} seconds...") # Optional: Verbose logging
             time.sleep(POLLING_INTERVAL_SECONDS)
 

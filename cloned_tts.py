@@ -7,6 +7,9 @@ import sys # To exit gracefully
 from thefuzz import process # Import for fuzzy matching
 import random
 
+from pydub import AudioSegment
+import tempfile
+
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -110,16 +113,33 @@ def find_and_generate_with_model_name(api_key: str, model_name_to_find: str, tex
         request = TTSRequest(
             text=text,
             reference_id=found_model_id,
-            prosody=prosody,
-            format="wav"
+            prosody=prosody
         )
 
         print(f"Generating audio for text: '{text}'")
         print(f"Saving audio to: {output_file}")
 
-        with open(output_file, "wb") as f:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp_mp3:
+            tmp_mp3_path = tmp_mp3.name
+            print(f"Saving temporary MP3 to: {tmp_mp3_path}")
             for chunk in session.tts(request):
-                f.write(chunk)
+                tmp_mp3.write(chunk)
+        
+        # Convert to WAV using pydub
+        print(f"Converting MP3 to WAV and saving to: {output_file}")
+
+        audio = AudioSegment.from_mp3(tmp_mp3_path)
+
+        # INDREASE VOLUME
+        boost_db = 12
+        louder_audio = audio + boost_db
+
+        # Export louder audio
+        louder_audio.export(output_file, format="wav")
+
+
+        # Clean up temporary MP3
+        os.remove(tmp_mp3_path)
 
         print(f"Successfully generated audio file: {output_file}")
         return True
