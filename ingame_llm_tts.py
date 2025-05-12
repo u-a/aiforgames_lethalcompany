@@ -187,14 +187,6 @@ if __name__ == "__main__":
         print("Missing FISH_AUDIO_API_KEY in .env.")
         exit(1)
 
-    # Fetch available voice model titles
-    print("Fetching available voice model titles from Fish Audio...")
-    available_model_titles = list_my_voice_models(fish_api_key, page_size=MODELS_PER_PAGE)
-
-    if not available_model_titles:
-        print("Error: No voice models found or failed to retrieve model list. Please ensure models are available on your Fish Audio account.")
-        exit(1)
-    print(f"Successfully retrieved {len(available_model_titles)} model titles: {', '.join(available_model_titles)}")
     print(f"Monitoring folder: '{WATCH_DIR}' for in-game context files...\n")
 
     while True:
@@ -247,9 +239,16 @@ if __name__ == "__main__":
 
                 # STEP 4: Select voice line and TTS model
                 text = random.choice(personalized_lines)
-                if not available_model_titles: # Should not happen due to check above, but as a safeguard
-                    print("Error: No models available for TTS generation. Skipping.")
-                    continue
+
+                # Fetch available voice model titles
+                print("Fetching available voice model titles from Fish Audio...")
+                available_model_titles = list_my_voice_models(fish_api_key, page_size=MODELS_PER_PAGE)
+
+                if not available_model_titles:
+                    print("Error: No voice models found or failed to retrieve model list. Please ensure models are available on your Fish Audio account.")
+                    exit(1)
+                print(f"Successfully retrieved {len(available_model_titles)} model titles: {', '.join(available_model_titles)}")
+                
                 model = random.choice(available_model_titles)
                 out_path = os.path.join(OUTPUT_DIR, fname.replace(".json", ".wav"))
 
