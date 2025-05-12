@@ -37,3 +37,5 @@ websockets==13.1
 webvtt-py==0.5.1
 wsproto==1.2.0
 yarl==1.20.0
+thefuzz
+audioop-lts==0.2.1

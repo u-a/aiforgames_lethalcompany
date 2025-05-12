@@ -8,8 +8,8 @@ $RequirementsFileName = "requirements.txt" # Relative to script location
 $ScriptDir = $PSScriptRoot
 $VenvDir = Join-Path $ScriptDir $VenvDirName
 $RequirementsFile = Join-Path $ScriptDir $RequirementsFileName
-$VenvActivateBat = Join-Path $VenvDir "Scripts" "activate.bat"
-$VenvActivatePs1 = Join-Path $VenvDir "Scripts" "Activate.ps1" # For PowerShell-internal activation
+$VenvActivateBat = Join-Path $VenvDir "Scripts\activate.bat"
+$VenvActivatePs1 = Join-Path $VenvDir "Scripts\Activate.ps1" # For PowerShell-internal activation
 
 # --- Helper Functions ---
 function Check-Python {
